@@ -1,0 +1,30 @@
+name: Run Python Script Every Minute
+
+on:
+  schedule:
+    - cron: '* * * * *'  # Runs at every minute
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'  # Specify Python version
+
+    - name: Install dependencies from Pipfile.lock
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv install --deploy --ignore-pipfile
+
+    - name: Run Python script
+      run: pipenv run python crypto_trade.py
+      env:
+        ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+        ALPACA_API_SECRET: ${{ secrets.ALPACA_API_SECRET }}
